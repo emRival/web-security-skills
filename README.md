@@ -46,11 +46,12 @@ Berikut adalah daftar sub-workflow keamanan yang bisa Anda jalankan secara terpi
 2. **`/security-injection`** - Mencegah *SQL Injection*, *Command Injection*, dan *XSS (Cross-Site Scripting)*.
 3. **`/security-auth`** - Mengamankan otentikasi (mencegah *Brute Force*, menerapkan 2FA, kebijakan *password*, dan proteksi CSRF).
 4. **`/security-session`** - Mencegah *Session Hijacking*, menetapkan *Role-Based Access Control (RBAC)*, mengamankan IDOR, dan konfigurasi *cookie flags*.
-5. **`/security-upload`** - Mengamankan fitur unggah file (validasi & pemindaian *malware*).
+5. **`/security-upload`** - Mengamankan fitur unggah file (validasi ekstensi, MIME, *malware scan*, dan verifikasi **Magic Bytes**).
 6. **`/security-headers`** - Menerapkan HTTP *Security Headers* dan *Content Security Policy (CSP)* untuk melindungi dari serangan sisi klien.
 7. **`/security-infra`** - Menerapkan HTTPS, mengatur CORS secara ketat, *trusted hosts*, dan konfigurasi *proxy*.
-8. **`/security-monitoring`** - Menambahkan *Activity Logging*, sistem *alert* keamanan, dan notifikasi webhook (mis. ke Slack/Discord).
-9. **`/security-checklist`** - *Checklist* validasi kesiapan produksi (*production readiness*) untuk memastikan tidak ada celah keamanan yang terlewat.
+8. **`/security-crypto`** - Mengelola kriptografi (enkripsi *field* data PII, *password hashing*, *HashIDs*, proteksi *secrets*, dan *Asymmetric Payload Encryption / E2EE*).
+9. **`/security-monitoring`** - Menambahkan *Activity Logging*, sistem *alert* keamanan, dan notifikasi webhook (mis. ke Slack/Discord).
+10. **`/security-checklist`** - *Checklist* validasi kesiapan produksi (*production readiness*) untuk memastikan tidak ada celah keamanan yang terlewat.
 
 ---
 
