@@ -13,7 +13,8 @@ description: Apply file upload security — extension/MIME validation, content s
 3. Extension NOT in blocked list
 4. Extension IS in allowed list
 5. MIME type matches allowed list
-6. No double extension (image.php.jpg)
+6. **Magic Bytes (File Signature) match the expected type**
+7. No double extension (image.php.jpg)
 7. No script code inside file content
 8. If image: verify with image library
 ```
@@ -44,6 +45,14 @@ Scan raw file bytes for embedded code:
 import os; import subprocess  (Python)
 ```
 
+### 5. Magic Bytes (File Signature) Verification
+Attackers often rename `shell.php` to `shell.pdf` to bypass extension checks. You must verify the **first few bytes** of the file to ensure the content matches the extension.
+- **PDF**: The first 4 bytes must be `%PDF` (Hex: `25 50 44 46`)
+- **JPEG**: The first 3 bytes must be `FF D8 FF`
+- **PNG**: The first 8 bytes must be `89 50 4E 47 0D 0A 1A 0A`
+- **ZIP/DOCX**: The first 4 bytes must be `PK\x03\x04` (Hex: `50 4B 03 04`)
+- *Action*: Reject the file if the magic bytes don't match the required signature.
+
 ### 5. Image Verification
 For image uploads, verify the file IS a real image:
 - Use `getimagesize()` (PHP), `sharp` (Node), `Pillow` (Python)
@@ -57,10 +66,10 @@ For image uploads, verify the file IS a real image:
 
 ## Implementation by Tech
 
-| Tech | Middleware | Image Check | Storage |
-|------|-----------|-------------|---------|
-| **Laravel** | Custom middleware + `UploadedFile` | `getimagesize()` | `Storage::disk('local')` |
-| **Express.js** | `multer` + custom validator | `sharp` / `image-size` | S3 or private dir |
-| **Next.js** | API route validation | `sharp` | Vercel Blob / S3 |
-| **Django** | Custom validator on `FileField` | `Pillow` | `MEDIA_ROOT` (private) |
-| **FastAPI** | `UploadFile` + `Depends()` | `Pillow` | Local dir / S3 |
+| Tech | Middleware | Magic Bytes / Signature Check | Storage |
+|------|-----------|-------------------------------|---------|
+| **Laravel** | Custom middleware + `UploadedFile` | `file` CLI / `finfo_open()` / validation rules | `Storage::disk('local')` |
+| **Express.js** | `multer` + custom validator | `file-type` npm package | S3 or private dir |
+| **Next.js** | API route validation | `file-type` npm package | Vercel Blob / S3 |
+| **Django** | Custom validator on `FileField` | `python-magic` package | `MEDIA_ROOT` (private) |
+| **FastAPI** | `UploadFile` + `Depends()` | `python-magic` package | Local dir / S3 |
