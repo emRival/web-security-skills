@@ -36,12 +36,20 @@ Prevent Insecure Direct Object Reference (IDOR) and resource enumeration by hidi
 - Use cryptographically secure pseudorandom number generators (CSPRNG) for tokens, OTPs, and temporary passwords.
 - `random_bytes()` in PHP, `crypto.randomBytes()` in Node, `secrets` module in Python.
 
+### 6. Asymmetric Payload Encryption (E2EE for Login)
+Secure highly sensitive payloads (like passwords during login) by encrypting them on the frontend before sending them over the network, providing an extra layer of defense even if HTTPS/TLS is compromised.
+- **Backend (BE)**: Generates an RSA/ECC Key Pair. Sends the **Public Key** to the Frontend.
+- **Frontend (FE)**: Uses the Public Key to encrypt the password before sending the login POST request.
+- **Backend (BE)**: Receives the encrypted payload and decrypts it using the **Private Key** (stored securely in memory/vault) before hashing and comparing it with the database.
+- *Note:* This prevents MITM attacks on load balancers or intermediate proxies from seeing the plaintext password.
+
 ## Implementation by Tech
 
-| Tech | Field Encryption | Hashing | HashID | CSPRNG |
-|------|------------------|---------|--------|--------|
-| **Laravel** | `encrypt()` / Casts `encrypted` | `Hash::make()` (Bcrypt/Argon2) | `vinkla/hashids` | `Str::random()` |
-| **Express.js** | custom crypto module | `bcrypt` / `argon2` npm | `hashids` npm | `crypto.randomBytes()` |
-| **Next.js** | `crypto` or Iron Session | `bcryptjs` / `argon2` | `hashids` npm | `crypto.randomBytes()` |
-| **Django** | `django-cryptography` | `make_password` (PBKDF2/Argon2) | `django-hashid-field` | `secrets.token_hex()` |
-| **FastAPI** | `cryptography.fernet` | `passlib[bcrypt]` | `hashids` pip | `secrets.token_urlsafe()` |
+| Tech | Field Encryption | Hashing | HashID | CSPRNG | Asymmetric Payload (BE) |
+|------|------------------|---------|--------|--------|-------------------------|
+| **Laravel** | `encrypt()` / Casts `encrypted` | `Hash::make()` (Bcrypt/Argon2) | `vinkla/hashids` | `Str::random()` | `openssl_pkey_new()` / `phpseclib` |
+| **Express.js** | custom crypto module | `bcrypt` / `argon2` npm | `hashids` npm | `crypto.randomBytes()` | `crypto.generateKeyPairSync('rsa')` |
+| **Next.js** | `crypto` or Iron Session | `bcryptjs` / `argon2` | `hashids` npm | `crypto.randomBytes()` | `crypto` module (Node) |
+| **Django** | `django-cryptography` | `make_password` (PBKDF2/Argon2) | `django-hashid-field` | `secrets.token_hex()` | `cryptography.hazmat.primitives` |
+| **FastAPI** | `cryptography.fernet` | `passlib[bcrypt]` | `hashids` pip | `secrets.token_urlsafe()` | `cryptography` Python package |
+| **React/Vue (FE)**| N/A | N/A | N/A | N/A | `jsencrypt` / `node-forge` (encrypt only) |
